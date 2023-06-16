@@ -13,7 +13,7 @@
 # - disable SElinux (/etc/sysconfig/selinux)
 
 
-dnf install -y gcc gcc-c++ sssd samba-commom krb5-workstation, openldap-clients ntp bind-utils nmap python38 python38-devel
+dnf install -y gcc gcc-c++ sssd krb5-workstation bind-utils nmap python38 python38-devel chrony
 
 
 # colorize
@@ -137,14 +137,15 @@ kdestroy
 
 # time sync
 echo "Synchronizing time..."
-systemctl enable ntpd.service
-systemctl stop   ntpd.service
-F=/etc/ntp.conf
+systemctl start chronyd
+systemctl enable chronyd
+F=/etc/chrony.conf
 mv -f --backup=numbered $F $F.orig
-cp -v etc-ntp.conf $F
+cp -v etc-chrony.conf $F
 sed -i "s/DC.EXAMPLE.COM/$DCFQDN/" $F
-ntpdate $DCFQDN
-systemctl start ntpd.service 
+timedatectl set-ntp true
+systemctl restart chronyd
+chronyc sources
 
 # setup kerberos
 echo "Configuring kerberos..."
@@ -168,10 +169,10 @@ chmod 644 $F
 # chmod 644 $F
 
 # check local keytab for new entry
-klist -k
-msg="Testing kerberos credentials for $HOSTUP\$..."
-echo -n $msg
-report ${#msg} $[`kinit -k $HOSTUP$|wc -l`+1]
+#klist -k
+#msg="Testing kerberos credentials for $HOSTUP\$..."
+#echo -n $msg
+#report ${#msg} $[`kinit -k $HOSTUP$|wc -l`+1]
 # chmod 644 /etc/krb5.keytab
 
 
