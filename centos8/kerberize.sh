@@ -240,6 +240,8 @@ systemctl start  sshd.service
 # msg="Testing ldap queries..."
 # echo -n $msg
 # report ${#msg} `ldapsearch -H ldap://$DCFQDN -Y GSSAPI -N -b $LDAP_BASE "(&(objectClass=computer)(dNSHostName=$HOSTFQDN))" 2>/dev/null |grep numEntries |wc -l`
+echo "stopping firewall..."
+systemctl stop firewalld
 
 echo Done.
 echo
