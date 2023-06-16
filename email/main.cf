@@ -1,0 +1,108 @@
+smtpd_banner = $myhostname ESMTP $mail_name (Ubuntu)
+biff = no
+append_dot_mydomain = yes
+readme_directory = no
+
+# TLS parameters
+smtpd_tls_auth_only = no
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls = yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_received_header = yes
+smtpd_tls_loglevel = 1
+
+
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtp_use_tls = yes
+smtp_tls_note_starttls_offer = yes
+
+myhostname = ubuntu
+mydomain = server.onsi.com.ar
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination = localhost, $myhostname, localhost.$mydomain, $mydomain
+relayhost = 
+mynetworks = 127.0.0.0/8
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+inet_protocols = ipv4
+smtpd_recipient_restrictions = 
+	permit_mynetworks,
+	permit_sasl_authenticated,
+	reject_unauth_destination
+
+# Alias virtuales
+#virtual_maps = ldap:/etc/postfix/ldap-alias.cf
+
+# ldap
+ldap_bind_dn = sganis@server.onsi.com.ar
+ldap_bind_pw = onsi-916
+ldap_search_base = cn=users,dc=server,dc=onsi,dc=com,dc=ar
+ldap_domain = dc=server,dc=onsi,dc=com,dc=ar
+ldap_server_host = onsi.no-ip.info
+ldap_server_port = 389
+ldap_version = 3
+
+# aliases y listas de distribucion
+virtual_alias_maps = ldap:grupos 
+#ldap:aliases 
+
+#aliases_server_host = $ldap_server_host
+#aliases_search_base = $ldap_search_base
+#aliases_query_filter = (userPrincipalName=%s)
+#aliases_result_attribute = mail
+#aliases_bind = yes
+#aliases_cache = no
+#aliases_bind_dn = $ldap_bind_dn
+#aliases_bind_pw = $ldap_bind_pw
+#aliases_version = $ldap_version
+
+grupos_server_host = $ldap_server_host
+grupos_server_port = $ldap_server_port
+grupos_search_base = $ldap_search_base
+grupos_bind_dn = $ldap_bind_dn
+grupos_bind_pw = $ldap_bind_pw
+grupos_version = $ldap_version
+grupos_bind = yes
+grupos_cache = no
+grupos_query_filter = (&(objectclass=group)(mail=%s))
+grupos_leaf_result_attribute = userPrincipalName
+grupos_special_result_attribute = member
+
+# buzones locales
+virtual_mailbox_base = /home/vmail
+virtual_mailbox_maps = ldap:buzones
+virtual_minimum_uid = 1000
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000
+
+buzones_server_host = $ldap_server_host
+buzones_search_base = $ldap_search_base
+buzones_query_filter = (&(objectclass=person)(userPrincipalName=%s))
+buzones_result_attribute = sAMAccountName
+buzones_cache = no
+buzones_bind = yes
+buzones_bind_dn = $ldap_bind_dn
+buzones_bind_pw = $ldap_bind_pw
+buzones_version = $ldap_version
+buzones_result_format = %s/
+local_recipient_maps = 
+	proxy:unix:passwd.byname, 
+	$virtual_mailbox_maps
+	#$alias_maps
+
+# imap
+mailbox_transport = dovecot
+dovecot_destination_recipient_limit = 1
+mailbox_command = /usr/lib/dovecot/deliver
+
+# sasl
+smtpd_sasl_auth_enable = yes
+broken_sasl_auth_clients = yes
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+
