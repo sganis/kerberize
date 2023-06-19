@@ -1,17 +1,19 @@
 #!/bin/sh
 #######################################################################
 # Script to kerberize Linux
-# Join a Linux machine to Active Directory and kerberize SSH
-# Tested in CentOS 7.0 with Windows 2012 R2
+# flask web app without joining to domain
+# Tested in CentOS 8 with Windows 2022
 #
 # Author: San (sganis@gmail.com)
 # Date: 08 June 2023
 #
 # Requirements:
-# - Forward and reversed DNS resolution, add the linux host to DNS in AD
-# - hostnames must resolve to fqdn
-# - disable SElinux (/etc/sysconfig/selinux)
-
+# - AD DNS with forward and reversed DNS resolution for linux host
+# - linux hostname must resolve to fqdn: centos.example.com
+# - create windows account, password never expires
+# - windows account, delegation, trust this user for delagation to any service (kerberos only)
+# - create keytab and transfer to linux
+# - firewall ports
 
 dnf install -y gcc gcc-c++ sssd krb5-workstation bind-utils nmap python38 python38-devel chrony
 
