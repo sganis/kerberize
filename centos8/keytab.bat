@@ -1,0 +1,1 @@
+ktpass.exe -princ HTTP/centos.example.com@EXAMPLE.COM -mapuser web-svc@EXAMPLE.COM -pass Password1! -crypto ALL -ptype KRB5_NT_PRINCIPAL -out web-svc.keytab
